@@ -2,6 +2,7 @@ from cradle.provider.llm.openai import OpenAIProvider
 from cradle.provider.llm.restful_claude import RestfulClaudeProvider
 from cradle.provider.llm.ollama import OllamaProvider
 from cradle.provider.llm.lmstudio import LMStudioProvider
+from cradle.provider.llm.vllm import VLLMProvider
 from cradle.utils import Singleton
 
 
@@ -37,6 +38,11 @@ class LLMFactory(metaclass=Singleton):
             llm_provider = LMStudioProvider()
             llm_provider.init_provider(llm_provider_config_path)
             # LM Studio can handle embeddings too
+            embed_provider = llm_provider
+        elif "vllm" in key:
+            llm_provider = VLLMProvider()
+            llm_provider.init_provider(llm_provider_config_path)
+            # vLLM can handle embeddings too
             embed_provider = llm_provider
 
         if not llm_provider or not embed_provider:

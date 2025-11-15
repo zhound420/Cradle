@@ -27,6 +27,7 @@ Examples:
 import argparse
 import sys
 import os
+import json
 from pathlib import Path
 
 # Game/App configurations
@@ -123,6 +124,10 @@ LLM_CONFIGS = {
     'lmstudio': {
         'llm': './conf/lmstudio_config.json',
         'embed': './conf/lmstudio_config.json'  # LM Studio handles embeddings
+    },
+    'vllm': {
+        'llm': './conf/vllm_config.json',
+        'embed': './conf/vllm_config.json'  # vLLM handles embeddings
     }
 }
 
@@ -178,6 +183,57 @@ def validate_env_file():
         response = input("Continue anyway? (y/N): ").strip().lower()
         if response != 'y':
             sys.exit(1)
+
+
+def get_provider_details(llm_config_path: str) -> dict:
+    """Get provider details from config file."""
+    try:
+        with open(llm_config_path, 'r') as f:
+            config = json.load(f)
+        return config
+    except:
+        return {}
+
+
+def show_provider_info(provider_key: str, llm_config_path: str):
+    """Show detailed provider information before running."""
+    # Provider metadata
+    provider_info = {
+        'openai': {'name': 'OpenAI', 'type': 'API', 'cost': 'Paid', 'icon': '🌐'},
+        'claude': {'name': 'Claude (Anthropic)', 'type': 'API', 'cost': 'Paid', 'icon': '🌐'},
+        'claude-aws': {'name': 'Claude (AWS)', 'type': 'API', 'cost': 'Paid', 'icon': '🌐'},
+        'ollama': {'name': 'Ollama', 'type': 'Local', 'cost': 'Free', 'icon': '💻'},
+        'lmstudio': {'name': 'LM Studio', 'type': 'Local', 'cost': 'Free', 'icon': '💻'},
+        'vllm': {'name': 'vLLM', 'type': 'Local', 'cost': 'Free', 'icon': '💻'},
+    }
+
+    info = provider_info.get(provider_key, {'name': provider_key, 'type': 'Unknown', 'cost': 'Unknown', 'icon': '❓'})
+    details = get_provider_details(llm_config_path)
+
+    print("\n" + "=" * 60)
+    print(f"{info['icon']} LLM Provider Information")
+    print("=" * 60)
+    print(f"Provider:     {info['name']}")
+    print(f"Type:         {info['type']}")
+    print(f"Cost:         {info['cost']}")
+
+    # Show model if available
+    if 'comp_model' in details:
+        print(f"Model:        {details['comp_model']}")
+    elif 'llm_model' in details:
+        print(f"Model:        {details['llm_model']}")
+
+    # Show base URL for local providers
+    if 'base_url' in details:
+        print(f"Endpoint:     {details['base_url']}")
+
+    # Cost warning for API providers
+    if info['cost'] == 'Paid':
+        print("\n⚠️  WARNING: This provider incurs API costs!")
+        print("   Estimated: $10-50/hour depending on usage")
+        print("   Consider using a local provider (ollama, lmstudio) for testing")
+
+    print("=" * 60)
 
 
 def main():
@@ -244,6 +300,9 @@ def main():
     # Validate files exist
     validate_config_files(llm_provider_config, embed_provider_config, env_config)
     validate_env_file()
+
+    # Show provider information
+    show_provider_info(args.llm, llm_provider_config)
 
     # Build command
     cmd_parts = [

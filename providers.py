@@ -1,0 +1,172 @@
+#!/usr/bin/env python3
+"""
+Provider management CLI tool.
+
+Easily manage and switch between LLM providers.
+
+Usage:
+    python providers.py                 # Show status of all providers
+    python providers.py --list          # List available providers
+    python providers.py --select        # Interactive provider selection
+    python providers.py --check ollama  # Check specific provider
+    python providers.py --set-default ollama  # Set default provider
+
+Examples:
+    # See what providers are available
+    python providers.py --list
+
+    # Pick a provider interactively
+    python providers.py --select
+
+    # Check if Ollama is running
+    python providers.py --check ollama
+
+    # Set LM Studio as default
+    python providers.py --set-default lmstudio
+"""
+
+import sys
+from pathlib import Path
+
+# Add scripts directory to path
+scripts_dir = Path(__file__).parent / 'scripts'
+sys.path.insert(0, str(scripts_dir))
+
+from common.provider_manager import ProviderManager
+
+
+def main():
+    """Main CLI entry point."""
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description='Manage LLM providers for Cradle',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=__doc__
+    )
+
+    parser.add_argument(
+        '--list',
+        action='store_true',
+        help='List all providers with status'
+    )
+
+    parser.add_argument(
+        '--status',
+        action='store_true',
+        help='Show detailed provider status'
+    )
+
+    parser.add_argument(
+        '--select',
+        action='store_true',
+        help='Interactive provider selection'
+    )
+
+    parser.add_argument(
+        '--set-default',
+        type=str,
+        metavar='PROVIDER',
+        help='Set default provider (openai, claude, ollama, lmstudio, vllm)'
+    )
+
+    parser.add_argument(
+        '--check',
+        type=str,
+        metavar='PROVIDER',
+        help='Check if specific provider is available'
+    )
+
+    parser.add_argument(
+        '--estimate-cost',
+        type=int,
+        nargs=2,
+        metavar=('PROVIDER', 'TOKENS'),
+        help='Estimate cost for provider and token count'
+    )
+
+    args = parser.parse_args()
+
+    manager = ProviderManager()
+
+    # If no arguments, show status
+    if len(sys.argv) == 1:
+        manager.print_status(verbose=False)
+        sys.exit(0)
+
+    # Handle arguments
+    if args.list or args.status:
+        manager.print_status(verbose=args.status)
+
+    elif args.select:
+        selected = manager.interactive_select_provider()
+        if selected:
+            manager.set_default_provider(selected)
+            provider_name = manager.PROVIDERS[selected].name
+            print(f"\n✅ Set {provider_name} as default provider")
+            print(f"\nYou can now run:")
+            print(f"  python run.py skylines  # Will use {provider_name}")
+        else:
+            print("\n❌ No provider selected")
+
+    elif args.set_default:
+        provider_key = args.set_default.lower()
+        if provider_key in manager.PROVIDERS:
+            manager.set_default_provider(provider_key)
+            provider_name = manager.PROVIDERS[provider_key].name
+            print(f"\n✅ Set {provider_name} as default provider")
+        else:
+            print(f"\n❌ Unknown provider: {provider_key}")
+            print(f"Available: {', '.join(manager.PROVIDERS.keys())}")
+            sys.exit(1)
+
+    elif args.check:
+        provider_key = args.check.lower()
+        if provider_key in manager.PROVIDERS:
+            provider = manager.PROVIDERS[provider_key]
+            available, msg = manager.check_provider_available(provider_key)
+
+            print(f"\n{'✅' if available else '❌'} {provider.name}")
+            print(f"Status: {msg}")
+
+            if not available:
+                print(f"\nTo use {provider.name}:")
+                if provider.requires_key:
+                    print(f"  1. Get API key from provider")
+                    print(f"  2. Add {provider.env_var} to .env file")
+                    print(f"  3. Run 'python setup.py --keys-only'")
+                else:
+                    print(f"  1. Install {provider.name}")
+                    print(f"  2. Start the server")
+                    if provider.base_url:
+                        print(f"  3. Server should run at {provider.base_url}")
+        else:
+            print(f"\n❌ Unknown provider: {provider_key}")
+            print(f"Available: {', '.join(manager.PROVIDERS.keys())}")
+            sys.exit(1)
+
+    elif args.estimate_cost:
+        provider_key = args.estimate_cost[0].lower()
+        num_tokens = args.estimate_cost[1]
+
+        if provider_key in manager.PROVIDERS:
+            cost, description = manager.estimate_cost(provider_key, num_tokens)
+            provider_name = manager.PROVIDERS[provider_key].name
+
+            print(f"\n💰 Cost Estimate for {provider_name}")
+            print(f"   {description}")
+
+            if cost == 0:
+                print(f"   ✅ FREE - running locally!")
+            else:
+                print(f"   ⚠️  This will cost real money")
+        else:
+            print(f"\n❌ Unknown provider: {provider_key}")
+            sys.exit(1)
+
+    else:
+        parser.print_help()
+
+
+if __name__ == '__main__':
+    main()

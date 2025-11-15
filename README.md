@@ -95,6 +95,55 @@ That's it! The simplified scripts handle all the complex configuration automatic
 
 ---
 
+# 🤖 LLM Provider Management
+
+Cradle supports multiple LLM providers - both API-based and local (FREE):
+
+### Manage Providers
+
+```bash
+# See all available providers
+python providers.py
+
+# Interactive provider selection
+python providers.py --select
+
+# Check if a provider is ready
+python providers.py --check ollama
+```
+
+### Supported Providers
+
+| Provider | Type | Cost | Command |
+|----------|------|------|---------|
+| **OpenAI** | API | Paid | `--llm openai` |
+| **Claude** | API | Paid | `--llm claude` |
+| **Ollama** 🆓 | Local | FREE | `--llm ollama` |
+| **LM Studio** 🆓 | Local | FREE | `--llm lmstudio` |
+| **vLLM** 🆓 | Local | FREE | `--llm vllm` |
+
+### Using Local LLMs (FREE!)
+
+**With Ollama** (Recommended):
+```bash
+# Install from https://ollama.com
+ollama pull llama3.2-vision
+
+# Run Cradle
+python run.py skylines --llm ollama
+```
+
+**With LM Studio**:
+```bash
+# Download from https://lmstudio.ai
+# Load a model in GUI → Start Server
+python run.py skylines --llm lmstudio
+```
+
+See [Provider Management Guide](docs/PROVIDER_MANAGEMENT.md) and [Local LLM Setup](docs/LOCAL_LLM_SETUP.md) for details.
+
+---
+
 # 💾 Manual Installation (Advanced)
 
 ## Prepare the Environment File
