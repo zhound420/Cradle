@@ -85,6 +85,13 @@ def main():
         help='Estimate cost for provider and token count'
     )
 
+    parser.add_argument(
+        '--configure-endpoint',
+        type=str,
+        metavar='PROVIDER',
+        help='Configure custom endpoint for local provider (ollama, lmstudio, vllm)'
+    )
+
     args = parser.parse_args()
 
     manager = ProviderManager()
@@ -163,6 +170,62 @@ def main():
         else:
             print(f"\n❌ Unknown provider: {provider_key}")
             sys.exit(1)
+
+    elif args.configure_endpoint:
+        from common.local_llm import configure_provider_endpoint, save_provider_config
+
+        provider_key = args.configure_endpoint.lower()
+
+        # Only allow local providers
+        local_providers = {
+            'ollama': ('Ollama', 'http://localhost:11434', 11434, '/api/tags'),
+            'lmstudio': ('LM Studio', 'http://localhost:1234', 1234, '/v1/models'),
+            'vllm': ('vLLM', 'http://localhost:8000', 8000, '/v1/models')
+        }
+
+        if provider_key not in local_providers:
+            print(f"\n❌ Can only configure local providers: {', '.join(local_providers.keys())}")
+            sys.exit(1)
+
+        name, default_url, default_port, endpoint = local_providers[provider_key]
+
+        print(f"\n🔧 Configure {name} Endpoint")
+        print("=" * 60)
+
+        result = configure_provider_endpoint(
+            provider_key=provider_key,
+            provider_name=name,
+            default_url=default_url,
+            default_port=default_port,
+            endpoint_check=endpoint
+        )
+
+        if result['configured']:
+            # Prepare config data based on provider
+            if provider_key == 'ollama':
+                config_data = {
+                    "base_url": f"{result['base_url']}/v1",
+                    "comp_model": "llama3.2-vision",
+                    "emb_model": "nomic-embed-text"
+                }
+            elif provider_key == 'lmstudio':
+                config_data = {
+                    "base_url": f"{result['base_url']}/v1",
+                    "comp_model": "local-model",
+                    "emb_model": "nomic-embed-text"
+                }
+            elif provider_key == 'vllm':
+                config_data = {
+                    "base_url": f"{result['base_url']}/v1",
+                    "comp_model": "local-model",
+                    "emb_model": "nomic-embed-text"
+                }
+
+            save_provider_config(provider_key, config_data)
+            print(f"\n✅ {name} configured successfully!")
+            print(f"\n   Test with: python providers.py --check {provider_key}")
+        else:
+            print(f"\n   Configuration cancelled")
 
     else:
         parser.print_help()

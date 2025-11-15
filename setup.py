@@ -5,8 +5,9 @@ Interactive setup wizard for Cradle.
 This script guides you through setting up Cradle:
 1. Python environment setup (conda)
 2. Dependency installation
-3. API key configuration
-4. Health check validation
+3. API key configuration (OpenAI, Claude)
+4. Local LLM provider configuration (Ollama, LM Studio, vLLM)
+5. Health check validation
 
 Usage:
     python setup.py           # Full interactive setup
@@ -22,7 +23,7 @@ from pathlib import Path
 scripts_dir = Path(__file__).parent / 'scripts'
 sys.path.insert(0, str(scripts_dir))
 
-from common import api_keys, conda_env, health_check
+from common import api_keys, conda_env, health_check, local_llm
 
 
 def print_welcome():
@@ -60,29 +61,96 @@ def setup_step_environment(args):
 def setup_step_api_keys(args):
     """Step 2: Configure API keys."""
     print("\n" + "█" * 60)
-    print("  STEP 2: API Keys")
+    print("  STEP 2: API Keys (API Providers)")
     print("█" * 60)
 
+    # Check if keys already exist
+    existing = api_keys.load_env_file()
+
     if args.quick:
-        # Check if keys already exist
-        existing = api_keys.load_env_file()
         if existing:
             print("\n✓ Found existing API keys in .env")
-            return True
+            has_openai = 'OA_OPENAI_KEY' in existing or 'AZ_OPENAI_KEY' in existing
+            has_claude = 'OA_CLAUDE_KEY' in existing or 'RF_CLAUDE_AK' in existing
+            print(f"   OpenAI: {'✓' if has_openai else '✗'}")
+            print(f"   Claude: {'✓' if has_claude else '✗'}")
         else:
-            print("\n⚠️  No API keys found!")
-            print("   Cannot continue in quick mode without API keys.")
-            print("   Run without --quick to configure keys interactively.")
-            return False
+            print("\n⏭️  No API keys found")
+            print("   You can configure later or use local providers")
+        return True
     else:
+        # Interactive mode - always run setup
+        print("\n💡 Configure API providers (OpenAI, Claude, Azure, AWS)")
+        print("   Press Enter to skip any provider you don't want to use")
+        print("   Local providers (Ollama, LM Studio, vLLM) are FREE alternatives")
+
         api_keys.interactive_setup()
         return True
 
 
-def setup_step_health_check(args):
-    """Step 3: Run health check."""
+def setup_step_local_providers(args):
+    """Step 3: Create local LLM provider configs."""
     print("\n" + "█" * 60)
-    print("  STEP 3: Health Check")
+    print("  STEP 3: Local LLM Providers (FREE)")
+    print("█" * 60)
+
+    print("\n✓ Creating default configuration files for local providers...")
+    print("  • Ollama (http://localhost:11434)")
+    print("  • LM Studio (http://localhost:1234)")
+    print("  • vLLM (http://localhost:8000)")
+
+    # Create default configs for local providers
+    from pathlib import Path
+    import json
+
+    conf_dir = Path("conf")
+    conf_dir.mkdir(exist_ok=True)
+
+    # Default configurations
+    configs = {
+        'ollama': {
+            "base_url": "http://localhost:11434/v1",
+            "comp_model": "llama3.2-vision",
+            "emb_model": "nomic-embed-text"
+        },
+        'lmstudio': {
+            "base_url": "http://localhost:1234/v1",
+            "comp_model": "local-model",
+            "emb_model": "nomic-embed-text"
+        },
+        'vllm': {
+            "base_url": "http://localhost:8000/v1",
+            "comp_model": "local-model",
+            "emb_model": "nomic-embed-text"
+        }
+    }
+
+    created_count = 0
+    for provider, config_data in configs.items():
+        config_file = conf_dir / f"{provider}_config.json"
+        if not config_file.exists():
+            with open(config_file, 'w') as f:
+                json.dump(config_data, f, indent=4)
+            created_count += 1
+
+    if created_count > 0:
+        print(f"\n  ✅ Created {created_count} configuration file(s)")
+    else:
+        print(f"\n  ✓ Configuration files already exist")
+
+    print("\n  💡 To use a remote server, edit the config files:")
+    print("     conf/ollama_config.json")
+    print("     conf/lmstudio_config.json")
+    print("     conf/vllm_config.json")
+    print("\n  Or use: python providers.py --help")
+
+    return True
+
+
+def setup_step_health_check(args):
+    """Step 4: Run health check."""
+    print("\n" + "█" * 60)
+    print("  STEP 4: Health Check")
     print("█" * 60)
 
     return health_check.run_health_check(verbose=True)
@@ -97,30 +165,39 @@ def print_next_steps():
 
 Next steps:
 
-1️⃣  Install a supported game or application:
+1️⃣  Manage LLM Providers:
+
+   python providers.py --list        # See all providers
+   python providers.py --select      # Choose default provider
+   python providers.py --check ollama  # Test specific provider
+
+2️⃣  Install a supported game or application:
    • Cities: Skylines (Recommended for beginners)
    • Stardew Valley
    • Red Dead Redemption 2
    • Microsoft Outlook
    • Google Chrome
 
-2️⃣  Run Cradle with simplified command:
+3️⃣  Run Cradle with simplified command:
 
-   python run.py skylines
+   python run.py skylines               # Use default provider
+   python run.py skylines --llm ollama  # Use specific provider
 
    Or see all options:
 
    python run.py --list
 
-3️⃣  Validate your setup:
+4️⃣  Validate your setup:
 
    python validate.py skylines
 
-4️⃣  Read the documentation:
+5️⃣  Read the documentation:
 
    • README.md - Overview and installation
    • CLAUDE.md - Detailed architecture guide
    • docs/envs/ - Game-specific setup guides
+   • docs/PROVIDER_MANAGEMENT.md - LLM provider guide
+   • docs/LOCAL_LLM_SETUP.md - Local LLM setup
 
 ═══════════════════════════════════════════════════════════
 
@@ -182,7 +259,12 @@ def main():
             print("\n❌ API key configuration failed")
             sys.exit(1)
 
-        # Step 3: Health Check
+        # Step 3: Local Providers
+        if not setup_step_local_providers(args):
+            print("\n❌ Local provider configuration failed")
+            sys.exit(1)
+
+        # Step 4: Health Check
         if not args.no_health_check:
             setup_step_health_check(args)
             # Don't fail on health check issues, just warn

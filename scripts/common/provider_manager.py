@@ -135,6 +135,53 @@ class ProviderManager:
         self._save_preferences()
 
 
+    def _load_provider_config(self, provider_key: str) -> Optional[dict]:
+        """Load provider configuration from JSON file.
+
+        Args:
+            provider_key: Provider key
+
+        Returns:
+            Config dict or None if not found
+        """
+        if provider_key not in self.PROVIDERS:
+            return None
+
+        provider = self.PROVIDERS[provider_key]
+        config_path = Path(provider.config_file)
+
+        if not config_path.exists():
+            return None
+
+        try:
+            with open(config_path, 'r') as f:
+                return json.load(f)
+        except Exception:
+            return None
+
+
+    def get_provider_base_url(self, provider_key: str) -> Optional[str]:
+        """Get base URL for a provider from its config file.
+
+        Args:
+            provider_key: Provider key
+
+        Returns:
+            Base URL or None if not found
+        """
+        config = self._load_provider_config(provider_key)
+        if config and 'base_url' in config:
+            # Remove /v1 suffix if present for health checks
+            base_url = config['base_url']
+            if base_url.endswith('/v1'):
+                return base_url[:-3]
+            return base_url
+
+        # Fall back to default from PROVIDERS
+        provider = self.PROVIDERS.get(provider_key)
+        return provider.base_url if provider else None
+
+
     def check_provider_configured(self, provider_key: str) -> Tuple[bool, str]:
         """Check if a provider is configured.
 
@@ -181,24 +228,27 @@ class ProviderManager:
             return True, "API key configured"
 
         # For local providers, check if server is running
-        if provider.base_url:
+        # Get base URL from config file (might be custom)
+        base_url = self.get_provider_base_url(provider_key)
+
+        if base_url:
             try:
                 if 'ollama' in provider_key:
-                    response = requests.get(f"{provider.base_url}/api/tags", timeout=2)
+                    response = requests.get(f"{base_url}/api/tags", timeout=2)
                 elif 'lmstudio' in provider_key:
-                    response = requests.get(f"{provider.base_url}/v1/models", timeout=2)
+                    response = requests.get(f"{base_url}/v1/models", timeout=2)
                 elif 'vllm' in provider_key:
-                    response = requests.get(f"{provider.base_url}/v1/models", timeout=2)
+                    response = requests.get(f"{base_url}/v1/models", timeout=2)
                 else:
-                    response = requests.get(provider.base_url, timeout=2)
+                    response = requests.get(base_url, timeout=2)
 
                 if response.status_code == 200:
-                    return True, "Server running"
+                    return True, f"Server running at {base_url}"
                 return False, f"Server error: {response.status_code}"
             except requests.exceptions.ConnectionError:
-                return False, "Server not running"
+                return False, f"Server not running at {base_url}"
             except requests.exceptions.Timeout:
-                return False, "Server timeout"
+                return False, f"Server timeout at {base_url}"
             except Exception as e:
                 return False, f"Error: {str(e)[:50]}"
 
