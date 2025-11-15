@@ -17,6 +17,11 @@ The Cradle framework empowers nascent foundation models to perform complex compu
 via the same unified interface humans use, i.e., screenshots as input and keyboard & mouse operations as output.
 
 ## 📢 Updates
+- **2024-11-15**: 🆓 **FREE Local LLM Support!** Added comprehensive support for local LLM providers (Ollama, LM Studio, vLLM) with:
+  - Multi-host/remote server support
+  - Automatic vision model detection and selection
+  - Interactive setup wizard with provider management
+  - Zero API costs - run everything locally!
 - 2024-06-27: A major update! Cradle is extened to four games: [RDR2](https://www.rockstargames.com/reddeadredemption2), [Stardew Valley](https://www.stardewvalley.net/), [Cities: Skylines](https://www.paradoxinteractive.com/games/cities-skylines/about), and [Dealer's Life 2](https://abyteentertainment.com/dealers-life-2/) and various software, including but not limited to Chrome, Outlook, Capcut, Meitu and Feishu. We also release our latest [paper](https://arxiv.org/pdf/2403.03186). Check it out!
 
 <div align="center">
@@ -60,8 +65,11 @@ python setup.py
 The setup wizard will guide you through:
 - ✓ Python environment configuration
 - ✓ Dependency installation
-- ✓ API key setup (OpenAI or Claude)
+- ✓ API key setup (OpenAI, Claude, Azure, AWS) - *optional*
+- ✓ Local provider configuration (Ollama, LM Studio, vLLM) - *automatic*
 - ✓ Health check validation
+
+**Note**: Setup auto-creates configs for local providers (localhost by default). You can skip API keys and use FREE local LLMs instead!
 
 ### 2. Run a Game or Application
 
@@ -110,24 +118,29 @@ python providers.py --select
 
 # Check if a provider is ready
 python providers.py --check ollama
+
+# Configure custom endpoint (for remote servers)
+python providers.py --configure-endpoint ollama
 ```
 
 ### Supported Providers
 
-| Provider | Type | Cost | Command |
-|----------|------|------|---------|
-| **OpenAI** | API | Paid | `--llm openai` |
-| **Claude** | API | Paid | `--llm claude` |
-| **Ollama** 🆓 | Local | FREE | `--llm ollama` |
-| **LM Studio** 🆓 | Local | FREE | `--llm lmstudio` |
-| **vLLM** 🆓 | Local | FREE | `--llm vllm` |
+| Provider | Type | Cost | Vision Support | Command |
+|----------|------|------|----------------|---------|
+| **OpenAI** | API | Paid | ✅ GPT-4o | `--llm openai` |
+| **Claude** | API | Paid | ✅ Claude 3.5 | `--llm claude` |
+| **Ollama** 🆓 | Local | FREE | ✅ llama3.2-vision, llava | `--llm ollama` |
+| **LM Studio** 🆓 | Local | FREE | ✅ llava, bakllava | `--llm lmstudio` |
+| **vLLM** 🆓 | Local | FREE | ✅ configurable | `--llm vllm` |
+
+**⚠️ Vision Model Requirement**: Cradle requires vision-capable models to process game screenshots. The setup automatically detects and guides you to select vision models.
 
 ### Using Local LLMs (FREE!)
 
 **With Ollama** (Recommended):
 ```bash
 # Install from https://ollama.com
-ollama pull llama3.2-vision
+ollama pull llama3.2-vision  # Vision model required!
 
 # Run Cradle
 python run.py skylines --llm ollama
@@ -136,9 +149,49 @@ python run.py skylines --llm ollama
 **With LM Studio**:
 ```bash
 # Download from https://lmstudio.ai
-# Load a model in GUI → Start Server
+# Load a VISION model (llava, bakllava, etc.) → Start Server
+
+# Configure with automatic model detection
+python providers.py --configure-endpoint lmstudio
+
+# Run Cradle
 python run.py skylines --llm lmstudio
 ```
+
+**With vLLM** (High throughput):
+```bash
+# Start vLLM server with a vision model
+vllm serve llava-hf/llava-v1.6-mistral-7b-hf
+
+# Configure endpoint
+python providers.py --configure-endpoint vllm
+
+# Run Cradle
+python run.py skylines --llm vllm
+```
+
+### Multi-Host Support 🌐
+
+Local providers can run on different hosts (localhost, LAN servers, remote GPU servers):
+
+```bash
+# Configure Ollama on remote server
+python providers.py --configure-endpoint ollama
+# Enter: 192.168.1.100:11434
+
+# Configure LM Studio on LAN
+python providers.py --configure-endpoint lmstudio
+# Enter: http://gpu-server.local:1234
+
+# Or manually edit config files
+# conf/ollama_config.json, conf/lmstudio_config.json, conf/vllm_config.json
+```
+
+**Vision Model Detection**: When configuring providers, Cradle automatically:
+- Detects available models from the server
+- Categorizes vision vs text-only models
+- Shows interactive selection menu
+- Warns if non-vision model selected
 
 See [Provider Management Guide](docs/PROVIDER_MANAGEMENT.md) and [Local LLM Setup](docs/LOCAL_LLM_SETUP.md) for details.
 
@@ -229,9 +282,12 @@ Cradle
 │   ├── env_config_stardew_cultivation.json
 │   ├── env_config_stardew_farm_clearup.json
 │   ├── env_config_stardew_shopping.json
-│   ├── openai_config.json
+│   ├── openai_config.json           # API providers
 │   ├── claude_config.json
 │   ├── restful_claude_config.json
+│   ├── ollama_config.json            # Local providers (FREE)
+│   ├── lmstudio_config.json
+│   ├── vllm_config.json
 │   └── ...
 ├── deps # The dependencies for the Cradle framework, ignore this folder
 ├── docs # The documentation for the Cradle framework, ignore this folder
