@@ -43,7 +43,59 @@ via the same unified interface humans use, i.e., screenshots as input and keyboa
 
 Click on either of the video thumbnails above to watch them on YouTube.
 
-# 💾 Installation
+# 🚀 Quick Start (Recommended)
+
+**NEW**: We now provide simplified setup and run scripts for easier usage!
+
+### 1. Clone and Setup
+```bash
+# Clone the repository
+git clone https://github.com/BAAI-Agents/Cradle.git
+cd Cradle
+
+# Run interactive setup wizard
+python setup.py
+```
+
+The setup wizard will guide you through:
+- ✓ Python environment configuration
+- ✓ Dependency installation
+- ✓ API key setup (OpenAI or Claude)
+- ✓ Health check validation
+
+### 2. Run a Game or Application
+
+```bash
+# List available games/apps
+python run.py --list
+
+# Run Cities: Skylines (recommended for beginners)
+python run.py skylines
+
+# Run with Claude instead of OpenAI
+python run.py skylines --llm claude
+
+# Other examples
+python run.py rdr2-story
+python run.py outlook
+python run.py stardew-shopping
+```
+
+### 3. Validate Your Setup
+
+```bash
+# Validate specific game/app
+python validate.py skylines
+
+# General health check
+python validate.py
+```
+
+That's it! The simplified scripts handle all the complex configuration automatically.
+
+---
+
+# 💾 Manual Installation (Advanced)
 
 ## Prepare the Environment File
 We currently provide access to OpenAI's and Claude's API. Please create a `.env` file in the root of the repository to store the keys (one of them is enough).
