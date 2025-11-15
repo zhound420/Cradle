@@ -1,8 +1,11 @@
 # Cradle: Empowering Foundation Agents Towards General Computer Control
 
+> **Enhanced Fork**: This fork includes FREE local LLM support (Ollama, LM Studio, vLLM), multi-host configuration, automatic vision model detection, and streamlined setup!
+
 <div align="center">
 
-[[Website]](https://baai-agents.github.io/Cradle/)
+[[Original Project]](https://baai-agents.github.io/Cradle/)
+[[This Fork]](https://github.com/zhound420/Cradle)
 [[arXiv]](https://arxiv.org/abs/2403.03186)
 [[PDF]](https://arxiv.org/pdf/2403.03186)
 
@@ -50,12 +53,12 @@ Click on either of the video thumbnails above to watch them on YouTube.
 
 # 🚀 Quick Start (Recommended)
 
-**NEW**: We now provide simplified setup and run scripts for easier usage!
+**This fork** provides simplified setup, FREE local LLM support, and automatic vision model detection!
 
 ### 1. Clone and Setup
 ```bash
-# Clone the repository
-git clone https://github.com/BAAI-Agents/Cradle.git
+# Clone this enhanced fork
+git clone https://github.com/zhound420/Cradle.git
 cd Cradle
 
 # Run interactive setup wizard
@@ -229,8 +232,8 @@ IDE_NAME refers to the IDE environment in which the repository's code runs, such
 ### Python Environment
 Please setup your python environment and install the required dependencies as:
 ```bash
-# Clone the repository
-git clone https://github.com/BAAI-Agents/Cradle.git
+# Clone this enhanced fork
+git clone https://github.com/zhound420/Cradle.git
 cd Cradle
 
 # Create a new conda environment
@@ -238,6 +241,8 @@ conda create --name cradle-dev python=3.10
 conda activate cradle-dev
 pip install -r requirements.txt
 ```
+
+**Note**: For most users, we recommend using `python setup.py` instead of manual installation.
 
 ### Install the OCR Tools
 ```
@@ -342,8 +347,21 @@ Cradle
 # 📚 Migrate to New Game
 Since each game's settings and the operating systems they are compatible with are different, Cradle cannot simply replace one game name to migrate to a new game. We suggest considering each game specifically. For example, RDR2, an independent AAA game, requires real-time combat, so we need to pause the game to wait for GPT-4o's response and then unpause the game to execute the actions. Stardew has the same issue. Other games like Dealer's Life 2 and Cities: Skylines do not have real-time requirements, so they do not need to pause. If the new game is similar to the latter, we recommend copying Cities: Skylines' implementation and following its implementation path to create the corresponding modules. Although each game may differ significantly, our Cradle framework can still achieve a unified adaptation for a game. Assuming the new game's name is **newgame**, the specific migration pipeline can be found [Migrate to New Game Guide](docs/envs/new_game.md). 
 
+# 🤝 About This Fork
+
+This is an enhanced fork of the original [Cradle project](https://github.com/BAAI-Agents/Cradle) with additional features:
+
+- 🆓 **FREE Local LLM Support**: Ollama, LM Studio, vLLM
+- 🌐 **Multi-Host Configuration**: Run providers on different hosts
+- 👁️ **Vision Model Detection**: Automatic detection and selection
+- 🧙 **Interactive Setup Wizard**: One-command installation
+- 📊 **Provider Management**: Easy switching between providers
+- 🔍 **Health Checks**: Validate your setup before running
+
+**Upstream Repository**: [BAAI-Agents/Cradle](https://github.com/BAAI-Agents/Cradle)
+
 # Citation
-If you find our work useful, please consider citing us!
+If you find this work useful, please consider citing the original Cradle paper:
 ```
 @article{tan2024cradle,
   title={Cradle: Empowering Foundation Agents towards General Computer Control},
