@@ -172,22 +172,25 @@ def main():
             sys.exit(1)
 
     elif args.configure_endpoint:
-        from common.local_llm import configure_provider_endpoint, save_provider_config
+        from common.local_llm import (configure_provider_endpoint, save_provider_config,
+                                      select_model_interactive, list_ollama_models,
+                                      get_lmstudio_models, is_vision_model)
+        import requests
 
         provider_key = args.configure_endpoint.lower()
 
         # Only allow local providers
         local_providers = {
-            'ollama': ('Ollama', 'http://localhost:11434', 11434, '/api/tags'),
-            'lmstudio': ('LM Studio', 'http://localhost:1234', 1234, '/v1/models'),
-            'vllm': ('vLLM', 'http://localhost:8000', 8000, '/v1/models')
+            'ollama': ('Ollama', 'http://localhost:11434', 11434, '/api/tags', 'llama3.2-vision'),
+            'lmstudio': ('LM Studio', 'http://localhost:1234', 1234, '/v1/models', 'local-model'),
+            'vllm': ('vLLM', 'http://localhost:8000', 8000, '/v1/models', 'local-model')
         }
 
         if provider_key not in local_providers:
             print(f"\n❌ Can only configure local providers: {', '.join(local_providers.keys())}")
             sys.exit(1)
 
-        name, default_url, default_port, endpoint = local_providers[provider_key]
+        name, default_url, default_port, endpoint, default_model = local_providers[provider_key]
 
         print(f"\n🔧 Configure {name} Endpoint")
         print("=" * 60)
@@ -201,28 +204,60 @@ def main():
         )
 
         if result['configured']:
+            base_url = result['base_url']
+
+            # Try to detect available models
+            available_models = []
+            selected_model = default_model
+
+            try:
+                print(f"\n🔍 Detecting available models...")
+                if provider_key == 'ollama':
+                    # Ollama uses different endpoint for listing
+                    available_models = list_ollama_models()
+                elif provider_key == 'lmstudio' or provider_key == 'vllm':
+                    available_models = get_lmstudio_models(base_url)
+
+                if available_models:
+                    print(f"   Found {len(available_models)} model(s)")
+                    selected_model = select_model_interactive(name, available_models, default_model)
+                else:
+                    print(f"   No models detected, using default: {default_model}")
+
+            except Exception as e:
+                print(f"   Could not detect models: {str(e)[:50]}")
+                print(f"   Using default: {default_model}")
+
             # Prepare config data based on provider
             if provider_key == 'ollama':
                 config_data = {
-                    "base_url": f"{result['base_url']}/v1",
-                    "comp_model": "llama3.2-vision",
+                    "base_url": f"{base_url}/v1",
+                    "comp_model": selected_model,
                     "emb_model": "nomic-embed-text"
                 }
             elif provider_key == 'lmstudio':
                 config_data = {
-                    "base_url": f"{result['base_url']}/v1",
-                    "comp_model": "local-model",
+                    "base_url": f"{base_url}/v1",
+                    "comp_model": selected_model,
                     "emb_model": "nomic-embed-text"
                 }
             elif provider_key == 'vllm':
                 config_data = {
-                    "base_url": f"{result['base_url']}/v1",
-                    "comp_model": "local-model",
+                    "base_url": f"{base_url}/v1",
+                    "comp_model": selected_model,
                     "emb_model": "nomic-embed-text"
                 }
 
             save_provider_config(provider_key, config_data)
+
+            # Show summary with vision warning
             print(f"\n✅ {name} configured successfully!")
+            print(f"   Model: {selected_model}")
+
+            if not is_vision_model(selected_model):
+                print(f"\n   ⚠️  WARNING: This model may not support vision!")
+                print(f"   Cradle requires vision models to process game screenshots")
+
             print(f"\n   Test with: python providers.py --check {provider_key}")
         else:
             print(f"\n   Configuration cancelled")

@@ -135,6 +135,41 @@ def get_lmstudio_models(base_url: str = "http://localhost:1234") -> List[str]:
         return []
 
 
+def is_vision_model(model_name: str) -> bool:
+    """Determine if a model supports vision based on its name.
+
+    Args:
+        model_name: Model name or ID
+
+    Returns:
+        True if model likely supports vision
+    """
+    vision_keywords = [
+        'vision', 'llava', 'llama3.2-vision', 'gpt-4o', 'gpt-4-vision',
+        'claude-3', 'gemini', 'bakllava', 'moondream', 'cogvlm',
+        'internvl', 'qwen-vl', 'yi-vl', 'minicpm-v'
+    ]
+
+    model_lower = model_name.lower()
+    return any(keyword in model_lower for keyword in vision_keywords)
+
+
+def detect_model_capabilities(model_name: str) -> Dict[str, bool]:
+    """Detect model capabilities based on name.
+
+    Args:
+        model_name: Model name or ID
+
+    Returns:
+        Dict with capability flags
+    """
+    return {
+        'vision': is_vision_model(model_name),
+        'chat': True,  # Assume all models support chat
+        'function_calling': 'gpt-4' in model_name.lower() or 'gpt-3.5' in model_name.lower()
+    }
+
+
 def detect_local_llms() -> dict:
     """Detect all available local LLM servers.
 
@@ -390,6 +425,88 @@ def configure_provider_endpoint(provider_key: str, provider_name: str,
     else:
         print(f"   Skipping {provider_name} configuration")
         return {'configured': False, 'base_url': default_url}
+
+
+def select_model_interactive(provider_name: str, available_models: List[str],
+                             default_model: str) -> Optional[str]:
+    """Interactively select a model from available models.
+
+    Args:
+        provider_name: Name of the provider (e.g., "Ollama")
+        available_models: List of available model names
+        default_model: Default model to use if none selected
+
+    Returns:
+        Selected model name or None
+    """
+    if not available_models:
+        print(f"\n⚠️  No models detected for {provider_name}")
+        return default_model
+
+    print(f"\n📦 Available Models in {provider_name}:")
+    print("=" * 60)
+
+    # Categorize models
+    vision_models = []
+    text_models = []
+
+    for model in available_models:
+        if is_vision_model(model):
+            vision_models.append(model)
+        else:
+            text_models.append(model)
+
+    # Show vision models first (Cradle needs vision!)
+    if vision_models:
+        print("\n✅ Vision Models (Recommended for Cradle):")
+        for i, model in enumerate(vision_models, 1):
+            print(f"   {i}. {model}")
+
+    if text_models:
+        print("\n⚠️  Text-Only Models (NOT recommended for Cradle):")
+        start_idx = len(vision_models) + 1
+        for i, model in enumerate(text_models, start_idx):
+            print(f"   {i}. {model}")
+
+    # Prompt for selection
+    print(f"\n💡 Cradle requires vision-capable models for screenshots")
+    print(f"   Default: {default_model}")
+
+    while True:
+        choice = input(f"\nSelect model number (or press Enter for default): ").strip()
+
+        if not choice:
+            # Use default
+            if default_model in available_models:
+                return default_model
+            elif vision_models:
+                # Auto-select first vision model
+                selected = vision_models[0]
+                print(f"   Auto-selected vision model: {selected}")
+                return selected
+            else:
+                print(f"   Using default: {default_model}")
+                return default_model
+
+        try:
+            idx = int(choice) - 1
+            all_models = vision_models + text_models
+            if 0 <= idx < len(all_models):
+                selected = all_models[idx]
+
+                # Warn if non-vision model selected
+                if not is_vision_model(selected):
+                    print(f"\n⚠️  WARNING: '{selected}' does not appear to support vision!")
+                    print(f"   Cradle requires vision models to process screenshots")
+                    confirm = input(f"   Use this model anyway? (y/N): ").strip().lower()
+                    if confirm != 'y':
+                        continue
+
+                return selected
+            else:
+                print(f"   Invalid selection. Choose 1-{len(all_models)}")
+        except ValueError:
+            print(f"   Please enter a number")
 
 
 def save_provider_config(provider_key: str, config_data: Dict, conf_dir: str = "./conf") -> bool:
