@@ -115,6 +115,14 @@ LLM_CONFIGS = {
     'claude-aws': {
         'llm': './conf/restful_claude_config.json',
         'embed': './conf/openai_config.json'
+    },
+    'ollama': {
+        'llm': './conf/ollama_config.json',
+        'embed': './conf/ollama_config.json'  # Ollama handles embeddings
+    },
+    'lmstudio': {
+        'llm': './conf/lmstudio_config.json',
+        'embed': './conf/lmstudio_config.json'  # LM Studio handles embeddings
     }
 }
 

@@ -1,5 +1,7 @@
 from cradle.provider.llm.openai import OpenAIProvider
 from cradle.provider.llm.restful_claude import RestfulClaudeProvider
+from cradle.provider.llm.ollama import OllamaProvider
+from cradle.provider.llm.lmstudio import LMStudioProvider
 from cradle.utils import Singleton
 
 
@@ -26,6 +28,16 @@ class LLMFactory(metaclass=Singleton):
             #logger.warn(f"Claude do not support embedding, use OpenAI instead.")
             embed_provider = OpenAIProvider()
             embed_provider.init_provider(embed_provider_config_path)
+        elif "ollama" in key:
+            llm_provider = OllamaProvider()
+            llm_provider.init_provider(llm_provider_config_path)
+            # Ollama can handle embeddings too
+            embed_provider = llm_provider
+        elif "lmstudio" in key:
+            llm_provider = LMStudioProvider()
+            llm_provider.init_provider(llm_provider_config_path)
+            # LM Studio can handle embeddings too
+            embed_provider = llm_provider
 
         if not llm_provider or not embed_provider:
             raise ValueError(key)

@@ -1,0 +1,5 @@
+{
+    "base_url": "http://localhost:1234/v1",
+    "comp_model": "local-model",
+    "emb_model": "nomic-embed-text"
+}
