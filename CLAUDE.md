@@ -1,13 +1,18 @@
-# CLAUDE.md - AI Assistant Guide for Cradle Framework
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
 
 **Cradle** is a framework that empowers foundation models (LLMs like GPT-4, Claude) to perform complex computer tasks via a unified interface: screenshots as input and keyboard & mouse operations as output.
 
+> **This is an Enhanced Fork** with FREE local LLM support, multi-host configuration, vision model detection, and streamlined setup scripts. Original project: [BAAI-Agents/Cradle](https://github.com/BAAI-Agents/Cradle)
+
 ### Purpose
 - Enable AI agents to control games and software applications autonomously
 - Provide a modular, extensible architecture for adding new environments
 - Support both real-time applications (games) and turn-based software
+- Support FREE local LLMs (Ollama, LM Studio, vLLM) alongside API providers
 - Implement a reasoning loop: information gathering → reflection → planning → execution
 
 ### Supported Environments
@@ -24,6 +29,82 @@
 - Capcut
 - Meitu (xiuxiu)
 - Feishu
+
+---
+
+## Fork-Specific Features
+
+This enhanced fork adds several features not in the original:
+
+### 🆓 FREE Local LLM Support
+- **Ollama**: Easiest setup, recommended for beginners
+- **LM Studio**: GUI-based model management
+- **vLLM**: High-throughput inference for advanced users
+- **No API costs**: Run completely free on local hardware
+
+### 🌐 Multi-Host Provider Configuration
+- Run providers on localhost, LAN servers, or remote GPU servers
+- Configure via `python providers.py --configure-endpoint <provider>`
+- Automatic endpoint validation and health checks
+
+### 👁️ Vision Model Detection
+- Automatic detection of vision-capable vs text-only models
+- Interactive model selection with capability warnings
+- Prevents accidentally using incompatible models
+
+### 🧙 Simplified Setup Scripts
+- `setup.py`: Interactive wizard for complete setup
+- `run.py`: Simple scenario execution (`python run.py skylines --llm ollama`)
+- `validate.py`: Automated validation and health checks
+- `providers.py`: Provider management and configuration
+
+### 📊 Enhanced Provider Management
+- Easy switching between providers: `python providers.py --select`
+- Connectivity checks: `python providers.py --check ollama`
+- List all scenarios: `python run.py --list`
+
+---
+
+## Quick Start
+
+### Simplified Setup (Recommended)
+
+This fork provides streamlined scripts for easy setup and execution:
+
+```bash
+# 1. Interactive setup wizard (handles dependencies, API keys, provider configs)
+python setup.py
+
+# 2. Run a game or application (simplified interface)
+python run.py skylines                    # Cities: Skylines with default provider
+python run.py skylines --llm ollama       # Use FREE local Ollama
+python run.py rdr2-story --llm claude     # RDR2 with Claude API
+python run.py outlook --llm lmstudio      # Outlook with LM Studio
+
+# 3. List available scenarios
+python run.py --list
+
+# 4. Validate setup
+python validate.py                        # General health check
+python validate.py skylines               # Scenario-specific validation
+
+# 5. Manage LLM providers
+python providers.py                       # List all providers
+python providers.py --select              # Interactive selection
+python providers.py --check ollama        # Check if provider is ready
+python providers.py --configure-endpoint ollama  # Configure remote/LAN host
+```
+
+### Advanced Usage (Direct runner.py)
+
+For fine-grained control, use `runner.py` directly:
+
+```bash
+python runner.py \
+  --llmProviderConfig ./conf/openai_config.json \
+  --embedProviderConfig ./conf/openai_config.json \
+  --envConfig ./conf/env_config_outlook.json
+```
 
 ---
 
@@ -383,6 +464,144 @@ instance = factory.create(key="outlook", **kwargs)
 
 ---
 
+## LLM Provider System
+
+### Vision Model Requirement
+
+**CRITICAL**: Cradle requires **vision-capable LLMs** to process game screenshots. Text-only models will not work.
+
+**Automatic Detection**: The fork includes automatic vision model detection:
+- `setup.py` and `providers.py` detect available models
+- Categorizes vision vs text-only models
+- Interactive selection menu with warnings
+- Validates vision capability before use
+
+**Vision-Capable Models by Provider**:
+
+| Provider | Vision Models | Status |
+|----------|---------------|--------|
+| OpenAI | `gpt-4o`, `gpt-4o-2024-05-13`, `gpt-4-vision-preview` | ✅ API |
+| Claude | `claude-3-5-sonnet-20241022`, `claude-3-opus`, `claude-3-sonnet` | ✅ API |
+| Ollama | `llama3.2-vision`, `llava`, `bakllava` | ✅ FREE Local |
+| LM Studio | `llava`, `bakllava`, any vision model | ✅ FREE Local |
+| vLLM | `llava-hf/llava-v1.6-mistral-7b-hf`, configurable | ✅ FREE Local |
+
+### Provider Configuration Overview
+
+Cradle supports both **API-based** (paid) and **local** (FREE) providers:
+
+**API Providers** (require API keys):
+- OpenAI (including Azure OpenAI)
+- Claude (Anthropic API or AWS Bedrock)
+
+**Local Providers** (FREE, no API keys):
+- Ollama (easiest setup, recommended)
+- LM Studio (GUI-based model management)
+- vLLM (high throughput, advanced)
+
+**Multi-Host Support**: Local providers can run on:
+- Localhost (default)
+- LAN servers (`192.168.1.100:11434`)
+- Remote GPU servers (`http://gpu-server.company.com:1234`)
+
+### LLM Provider Configuration Files
+
+All provider configs are in `conf/` directory:
+
+**API Providers:**
+- `conf/openai_config.json` - OpenAI API
+- `conf/claude_config.json` - Claude Anthropic API
+- `conf/restful_claude_config.json` - Claude via AWS Bedrock
+
+**Local Providers (FREE):**
+- `conf/ollama_config.json` - Ollama
+- `conf/lmstudio_config.json` - LM Studio
+- `conf/vllm_config.json` - vLLM
+
+### Setting Up Local Providers (FREE)
+
+#### Option 1: Ollama (Recommended)
+
+```bash
+# 1. Install from https://ollama.com
+curl -fsSL https://ollama.com/install.sh | sh
+
+# 2. Pull a vision model (REQUIRED)
+ollama pull llama3.2-vision
+
+# 3. Configure (automatic if localhost:11434)
+python providers.py --configure-endpoint ollama
+# Or manually edit conf/ollama_config.json:
+# {"base_url": "http://localhost:11434", "comp_model": "llama3.2-vision"}
+
+# 4. Run Cradle
+python run.py skylines --llm ollama
+```
+
+#### Option 2: LM Studio
+
+```bash
+# 1. Download from https://lmstudio.ai
+# 2. Load a VISION model (e.g., llava, bakllava)
+# 3. Click "Start Server" (default: http://localhost:1234)
+
+# 4. Configure with automatic detection
+python providers.py --configure-endpoint lmstudio
+# This will:
+# - Detect available models from server
+# - Show which are vision-capable
+# - Let you select interactively
+
+# 5. Run Cradle
+python run.py skylines --llm lmstudio
+```
+
+#### Option 3: vLLM (High Throughput)
+
+```bash
+# 1. Install vLLM
+pip install vllm
+
+# 2. Start server with vision model
+vllm serve llava-hf/llava-v1.6-mistral-7b-hf --port 8000
+
+# 3. Configure endpoint
+python providers.py --configure-endpoint vllm
+# Enter: http://localhost:8000
+# Select vision model from detected list
+
+# 4. Run Cradle
+python run.py skylines --llm vllm
+```
+
+### Multi-Host Configuration
+
+Run providers on different machines (LAN servers, remote GPUs):
+
+```bash
+# Configure Ollama on remote server
+python providers.py --configure-endpoint ollama
+# Prompt: Enter base URL for ollama
+# Input: http://192.168.1.100:11434
+
+# Or edit conf/ollama_config.json directly:
+{
+  "base_url": "http://192.168.1.100:11434",
+  "comp_model": "llama3.2-vision"
+}
+
+# Same for other providers
+python providers.py --configure-endpoint lmstudio
+# Input: http://gpu-server.local:1234
+```
+
+**Network Requirements**:
+- Provider server must be reachable from client
+- Firewall rules allow port access (11434 for Ollama, 1234 for LM Studio, custom for vLLM)
+- Use `python providers.py --check <provider>` to validate connectivity
+
+---
+
 ## Configuration System
 
 ### Environment Configuration
@@ -440,14 +659,14 @@ instance = factory.create(key="outlook", **kwargs)
 }
 ```
 
-### LLM Provider Configuration
+### API Provider Configuration Examples
 
 **File**: `conf/openai_config.json`
 ```json
 {
   "key_var": "OA_OPENAI_KEY",              // Environment variable name
   "emb_model": "text-embedding-ada-002",
-  "comp_model": "gpt-4o-2024-05-13",
+  "comp_model": "gpt-4o-2024-05-13",       // Vision-capable model
   "is_azure": false
 }
 ```
@@ -456,29 +675,49 @@ instance = factory.create(key="outlook", **kwargs)
 ```json
 {
   "key_var": "OA_CLAUDE_KEY",
-  "comp_model": "claude-3-5-sonnet-20241022"
+  "comp_model": "claude-3-5-sonnet-20241022"  // Vision-capable model
+}
+```
+
+**File**: `conf/ollama_config.json` (Local - FREE)
+```json
+{
+  "base_url": "http://localhost:11434",   // Or remote: http://192.168.1.100:11434
+  "comp_model": "llama3.2-vision"          // Vision model required
+}
+```
+
+**File**: `conf/lmstudio_config.json` (Local - FREE)
+```json
+{
+  "base_url": "http://localhost:1234",
+  "comp_model": "llava-v1.6-mistral-7b"    // Vision model required
 }
 ```
 
 ### Environment Variables
 
 **File**: `.env` (in repo root, gitignored)
+
+**API Keys** (optional - only needed for API providers):
 ```bash
-# OpenAI
+# OpenAI (optional if using local providers)
 OA_OPENAI_KEY=sk-...
 
-# Azure OpenAI
+# Azure OpenAI (optional)
 AZ_OPENAI_KEY=...
 AZ_BASE_URL=https://....openai.azure.com/
 
-# Claude
+# Claude (optional)
 OA_CLAUDE_KEY=sk-ant-...
-RF_CLAUDE_AK=...  # AWS access key
-RF_CLAUDE_SK=...  # AWS secret key
+RF_CLAUDE_AK=...  # AWS access key for Bedrock
+RF_CLAUDE_SK=...  # AWS secret key for Bedrock
 
 # Development
 IDE_NAME=Code     # "Code" for VSCode, "PyCharm", etc.
 ```
+
+**Note**: Local providers (Ollama, LM Studio, vLLM) do NOT require API keys. Leave the above blank if only using local providers.
 
 ---
 
@@ -730,17 +969,45 @@ Decomposes high-level tasks into subtasks.
 
 ### Running an Experiment
 
+#### Quick Method (Simplified Scripts)
+
 1. **Ensure environment is set up:**
    ```bash
    conda activate cradle-dev
+   python setup.py  # Interactive setup if first time
    ```
 
-2. **Configure API keys in `.env`:**
+2. **Choose and configure provider:**
+   ```bash
+   # For FREE local LLM (no API keys needed)
+   ollama pull llama3.2-vision
+   python providers.py --configure-endpoint ollama
+
+   # OR for API providers (requires .env with keys)
+   echo 'OA_OPENAI_KEY=sk-...' >> .env
+   ```
+
+3. **Run scenario:**
+   ```bash
+   python run.py skylines --llm ollama     # FREE local
+   python run.py outlook --llm openai      # Paid API
+   python run.py rdr2-story --llm claude   # Paid API
+   ```
+
+4. **Monitor execution:**
+   - Console output shows real-time progress
+   - Detailed logs in `logs/` directory
+   - Screenshots saved during execution
+   - Use `Ctrl+C` to stop gracefully
+
+#### Advanced Method (Direct runner.py)
+
+1. **Configure `.env` for API providers:**
    ```bash
    echo 'OA_OPENAI_KEY=sk-...' >> .env
    ```
 
-3. **Run with specific task:**
+2. **Run with full control:**
    ```bash
    python runner.py \
      --llmProviderConfig ./conf/openai_config.json \
@@ -748,7 +1015,7 @@ Decomposes high-level tasks into subtasks.
      --envConfig ./conf/env_config_outlook.json
    ```
 
-4. **Monitor logs:**
+3. **Monitor logs:**
    - Console output shows progress
    - Detailed logs in `logs/` directory
    - Screenshots saved during execution
@@ -839,13 +1106,30 @@ Decomposes high-level tasks into subtasks.
 
 ### Current Approach
 
-**No formal test suite** (no pytest, unittest files found).
+**No formal pytest/unittest suite** - validation is scenario-based and end-to-end.
 
-**Testing is primarily:**
+**Testing methods:**
 1. **Task-based validation**: Define tasks in `task_description_list`
-2. **Manual execution**: Run agent and observe behavior
-3. **Log analysis**: Review detailed logs for errors
-4. **Screenshot review**: Verify visual understanding
+2. **Automated validation**: Use `python validate.py [scenario]`
+3. **Manual execution**: Run agent and observe behavior
+4. **Log analysis**: Review detailed logs in `logs/` for errors
+5. **Screenshot review**: Verify visual understanding from saved frames
+
+### Validation Commands
+
+```bash
+# General health check (validates setup, dependencies, providers)
+python validate.py
+
+# Scenario-specific validation
+python validate.py skylines
+python validate.py outlook
+python validate.py rdr2-story
+
+# Check provider connectivity
+python providers.py --check ollama
+python providers.py --check openai
+```
 
 ### Debugging Tools
 
@@ -1083,6 +1367,46 @@ dill==0.3.8                          # Function serialization
 
 ---
 
+## Development Best Practices
+
+### Commit and Pull Request Guidelines
+
+**Commit Style** (from AGENTS.md):
+- Use short, imperative subjects (e.g., "Fix duration check on Windows")
+- Group logically related changes together
+- Config tweaks should mention the impacted environment slug
+- Reference issues when applicable: `Fix #91`
+
+**Examples:**
+```bash
+git commit -m "Add llama3.2-vision support to Ollama provider"
+git commit -m "Fix skill embedding regeneration for RDR2"
+git commit -m "Update action_planning prompt for Outlook"
+```
+
+**Pull Requests:**
+- Summarize the scenario and motivation
+- List reproduction commands for testing
+- Link tracking issues
+- Attach screenshots/videos for UI-facing updates
+- Note required `.env` keys or resource refresh steps
+- Ensure `docs/envs/<env>.md` steps still work end-to-end
+
+### Security and Configuration
+
+**Secrets Management**:
+- Store API keys and tokens ONLY in `.env` (gitignored)
+- Review `conf/*` files before commits - no tenant-specific endpoints
+- Never commit credentials, cookies, or personal data
+- Use synthetic/anonymized examples in documentation
+
+**Resource Files**:
+- Large assets in `res/<env>/saves` should be anonymized
+- Scrub personal data from captured screenshots
+- Prefer synthetic examples when documenting workflows
+
+---
+
 ## Best Practices for AI Assistants
 
 ### When Reading Code
@@ -1134,15 +1458,31 @@ dill==0.3.8                          # Function serialization
 ### Common Commands
 
 ```bash
-# Setup environment
+# Setup environment (automated)
+python setup.py
+
+# Manual setup
 conda create -n cradle-dev python=3.10
 conda activate cradle-dev
 pip install -r requirements.txt
-
-# Install OCR
 python -m spacy download en_core_web_lg
 
-# Run agent
+# Run scenarios (simplified)
+python run.py --list                      # List all scenarios
+python run.py skylines --llm ollama       # Run with local LLM
+python run.py outlook --llm openai        # Run with API provider
+
+# Validate setup
+python validate.py                        # General health check
+python validate.py skylines               # Scenario validation
+
+# Provider management
+python providers.py                       # List providers
+python providers.py --select              # Interactive selection
+python providers.py --check ollama        # Check connectivity
+python providers.py --configure-endpoint ollama  # Configure endpoint
+
+# Advanced (direct runner.py)
 python runner.py \
   --llmProviderConfig ./conf/openai_config.json \
   --embedProviderConfig ./conf/openai_config.json \
@@ -1164,21 +1504,36 @@ from cradle.environment.{env}.skill_registry import register_skill
 
 ## Contact and Resources
 
-- **Repository**: https://github.com/BAAI-Agents/Cradle
-- **Paper**: https://arxiv.org/abs/2403.03186
-- **Website**: https://baai-agents.github.io/Cradle/
+### This Fork (Enhanced)
+- **This Repository**: https://github.com/zhound420/Cradle
+- **Features**: FREE local LLM support, multi-host config, vision model detection, simplified setup
+- **Provider Setup**: See "LLM Provider System" section above
+- **Quick Start**: `python setup.py` → `python run.py --list`
 
+### Original Project
+- **Original Repository**: https://github.com/BAAI-Agents/Cradle
+- **Research Paper**: https://arxiv.org/abs/2403.03186
+- **Project Website**: https://baai-agents.github.io/Cradle/
+
+### Documentation
 For specific environment setup, see:
-- `docs/envs/rdr2.md`
-- `docs/envs/stardew.md`
-- `docs/envs/skylines.md`
-- `docs/envs/dealers.md`
-- `docs/envs/software.md`
+- `docs/envs/rdr2.md` - Red Dead Redemption 2
+- `docs/envs/stardew.md` - Stardew Valley
+- `docs/envs/skylines.md` - Cities: Skylines
+- `docs/envs/dealers.md` - Dealer's Life 2
+- `docs/envs/software.md` - Software applications (Outlook, Chrome, etc.)
 
 For migrating to new environments:
-- `docs/envs/new_game.md`
+- `docs/envs/new_game.md` - Comprehensive migration guide
+
+### Helper Scripts (This Fork)
+- `setup.py` - Interactive setup wizard
+- `run.py` - Simplified scenario execution
+- `validate.py` - Setup and scenario validation
+- `providers.py` - Provider management and configuration
 
 ---
 
-*Last updated: 2025-11-15*
-*Framework version: Based on commit d7752fc*
+*Last updated: 2025-01-15*
+*Fork version: Enhanced with local LLM support*
+*Based on original Cradle commit: d7752fc*
