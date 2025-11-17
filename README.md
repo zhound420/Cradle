@@ -1,6 +1,6 @@
 # Cradle: Empowering Foundation Agents Towards General Computer Control
 
-> **Enhanced Fork**: This fork includes FREE local LLM support (Ollama, LM Studio, vLLM), multi-host configuration, automatic vision model detection, and streamlined setup!
+> **Enhanced Fork**: This fork includes an **automated game setup wizard**, FREE local LLM support (Ollama, LM Studio, vLLM), multi-host configuration, automatic vision model detection, and streamlined setup - making Cradle dramatically easier to use!
 
 <div align="center">
 
@@ -20,6 +20,13 @@ The Cradle framework empowers nascent foundation models to perform complex compu
 via the same unified interface humans use, i.e., screenshots as input and keyboard & mouse operations as output.
 
 ## 📢 Updates
+- **2025-01-17**: 🎮 **Automated Game Setup Wizard!** New comprehensive setup system that makes configuring games dramatically easier:
+  - Multi-platform game installation detection (Windows/macOS/Linux)
+  - Automated save file installation to OS-specific locations with backups
+  - Interactive checklists for in-game settings with progress tracking
+  - Automatic dependency installation (GroundingDino, PyTorch for RDR2)
+  - Complete validation before running
+  - See [Game Setup Guide](docs/GAME_SETUP_GUIDE.md) for details
 - **2024-11-15**: 🆓 **FREE Local LLM Support!** Added comprehensive support for local LLM providers (Ollama, LM Studio, vLLM) with:
   - Multi-host/remote server support
   - Automatic vision model detection and selection
@@ -50,6 +57,25 @@ via the same unified interface humans use, i.e., screenshots as input and keyboa
 </div>
 
 Click on either of the video thumbnails above to watch them on YouTube.
+
+## ✨ Key Features of This Fork
+
+This enhanced fork makes Cradle significantly easier to set up and use:
+
+| Feature | Description | Status |
+|---------|-------------|--------|
+| **🎮 Game Setup Wizard** | Automated game configuration with installation detection, save file management, and interactive checklists | ✅ NEW |
+| **🆓 FREE Local LLMs** | Run with Ollama, LM Studio, or vLLM - no API costs | ✅ |
+| **👁️ Vision Model Detection** | Automatic detection and selection of vision-capable models | ✅ |
+| **🌐 Multi-Host Support** | Configure providers on localhost, LAN servers, or remote GPUs | ✅ |
+| **⚡ Simplified Scripts** | `setup.py`, `run.py`, `game-setup.py` for easy execution | ✅ |
+| **✓ Validation Tools** | Automated health checks and setup validation | ✅ |
+| **📚 Enhanced Documentation** | Comprehensive guides for setup, providers, and games | ✅ |
+
+**Quick comparison:**
+
+- **Original**: Manual save file copying, complex setup, API-only, steep learning curve
+- **This Fork**: Automated setup wizard, FREE local LLMs, one-command game setup, beginner-friendly
 
 # 🚀 Quick Start (Recommended)
 
@@ -384,12 +410,28 @@ Since each game's settings and the operating systems they are compatible with ar
 
 This is an enhanced fork of the original [Cradle project](https://github.com/BAAI-Agents/Cradle) with additional features:
 
-- 🆓 **FREE Local LLM Support**: Ollama, LM Studio, vLLM
-- 🌐 **Multi-Host Configuration**: Run providers on different hosts
-- 👁️ **Vision Model Detection**: Automatic detection and selection
-- 🧙 **Interactive Setup Wizard**: One-command installation
-- 📊 **Provider Management**: Easy switching between providers
-- 🔍 **Health Checks**: Validate your setup before running
+- 🎮 **Automated Game Setup Wizard**: One-command game configuration with installation detection, save file management, and interactive checklists
+- 🆓 **FREE Local LLM Support**: Ollama, LM Studio, vLLM - no API costs
+- 🌐 **Multi-Host Configuration**: Run providers on localhost, LAN servers, or remote GPUs
+- 👁️ **Vision Model Detection**: Automatic detection and selection of vision-capable models
+- 🧙 **Interactive Setup Wizards**: `setup.py` and `game-setup.py` for streamlined installation
+- 📊 **Provider Management**: Easy switching between providers with `providers.py`
+- 🔍 **Health Checks**: Validate your setup before running with `validate.py`
+- ⚡ **Simplified Execution**: `run.py` for easy game/app launching
+- 📚 **Enhanced Documentation**: Comprehensive guides for all features
+
+**Key Tools**:
+- `python setup.py` - General environment setup
+- `python game-setup.py <game>` - Game-specific configuration wizard
+- `python run.py <game> --llm <provider>` - Run with any LLM provider
+- `python validate.py <game>` - Validate setup
+- `python providers.py` - Manage LLM providers
+
+**Documentation**:
+- [Game Setup Guide](docs/GAME_SETUP_GUIDE.md) - Complete game setup documentation
+- [Provider Management](docs/PROVIDER_MANAGEMENT.md) - LLM provider configuration
+- [Local LLM Setup](docs/LOCAL_LLM_SETUP.md) - FREE local LLM setup guide
+- [CLAUDE.md](CLAUDE.md) - Detailed architecture and development guide
 
 **Upstream Repository**: [BAAI-Agents/Cradle](https://github.com/BAAI-Agents/Cradle)
 
