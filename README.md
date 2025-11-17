@@ -20,7 +20,7 @@ The Cradle framework empowers nascent foundation models to perform complex compu
 via the same unified interface humans use, i.e., screenshots as input and keyboard & mouse operations as output.
 
 ## 📢 Updates
-- **2025-01-17**: 🎮 **Automated Game Setup Wizard!** New comprehensive setup system that makes configuring games dramatically easier:
+- **2025-11-17**: 🎮 **Automated Game Setup Wizard!** New comprehensive setup system that makes configuring games dramatically easier:
   - Multi-platform game installation detection (Windows/macOS/Linux)
   - Automated save file installation to OS-specific locations with backups
   - Interactive checklists for in-game settings with progress tracking
