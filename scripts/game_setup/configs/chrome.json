@@ -1,0 +1,55 @@
+{
+  "display_name": "Google Chrome",
+  "short_name": "chrome",
+  "type": "application",
+  "platform": "multi",
+  "env_config": "conf/env_config_chrome.json",
+  "description": "Web browser application",
+
+  "requirements": {
+    "resolution": "1920x1080",
+    "aspect_ratio": "16:9",
+    "window_mode": "Windowed"
+  },
+
+  "dependencies": [],
+
+  "save_files": {
+    "enabled": false
+  },
+
+  "checklist": [
+    {
+      "id": "install",
+      "title": "Install Google Chrome",
+      "description": "Ensure Chrome is installed",
+      "instructions": [
+        "Download from https://www.google.com/chrome/",
+        "Install Chrome",
+        "Launch and complete initial setup"
+      ],
+      "optional": false
+    },
+    {
+      "id": "window_size",
+      "title": "Set Window Size",
+      "description": "Configure window for consistent layout",
+      "instructions": [
+        "Launch Chrome",
+        "Set window to standard size or maximize",
+        "Ensure address bar and tabs are visible"
+      ],
+      "optional": false
+    }
+  ],
+
+  "validation": {
+    "check_window": true,
+    "window_pattern": "Chrome",
+    "check_resolution": false
+  },
+
+  "quick_start": {
+    "command": "python run.py chrome"
+  }
+}

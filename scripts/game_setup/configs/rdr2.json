@@ -1,0 +1,149 @@
+{
+  "display_name": "Red Dead Redemption 2",
+  "short_name": "rdr2",
+  "type": "game",
+  "platform": "windows",
+  "env_config": "conf/env_config_rdr2.json",
+  "description": "Open-world Western adventure game",
+
+  "requirements": {
+    "resolution": "1920x1080",
+    "aspect_ratio": "16:9",
+    "window_mode": "Windowed Borderless",
+    "platform_notes": {
+      "windows": "Only available on Windows. Supports 1920x1080, 2560x1440, or 3840x2160",
+      "darwin": "Not supported on macOS",
+      "linux": "Not supported on Linux"
+    }
+  },
+
+  "dependencies": [
+    {
+      "name": "GroundingDino",
+      "required": true,
+      "auto_install": true,
+      "description": "Object detection model for visual understanding"
+    },
+    {
+      "name": "VideoSubFinder",
+      "required": true,
+      "auto_install": false,
+      "description": "Subtitle extraction tool for dialogue recognition",
+      "manual_steps": [
+        "Download from https://sourceforge.net/projects/videosubfinder/",
+        "Extract to res/tool/subfinder/",
+        "Copy res/tool/general.cfg to res/tool/subfinder/settings/general.cfg"
+      ]
+    },
+    {
+      "name": "PyTorch",
+      "required": true,
+      "auto_install": false,
+      "description": "Deep learning framework (GPU recommended)"
+    }
+  ],
+
+  "save_files": {
+    "enabled": true,
+    "source_dir": "res/rdr2/saves",
+    "files": [],
+    "notes": "Save files for Chapter 2 open-ended tasks provided"
+  },
+
+  "checklist": [
+    {
+      "id": "mouse_mode",
+      "title": "Change Mouse Mode to DirectInput",
+      "description": "Required for proper mouse control",
+      "instructions": [
+        "Launch RDR2",
+        "Go to Settings → Controls",
+        "Find 'Mouse Input Method'",
+        "Change from 'Raw Input' to 'DirectInput'",
+        "Apply settings"
+      ],
+      "optional": false,
+      "image_path": "docs/envs/images/rdr2/direct_input.png"
+    },
+    {
+      "id": "tap_hold_speed",
+      "title": "Enable Tap and Hold Speed Control",
+      "description": "Allows double-tap W to run without holding Shift",
+      "instructions": [
+        "Go to Settings → Controls",
+        "Find both 'Tap and Hold Speed Control' options",
+        "Set both to ON",
+        "Set 'Aiming Mode' to 'Hold To Aim'",
+        "Apply settings"
+      ],
+      "optional": false,
+      "image_path": "docs/envs/images/rdr2/move_control_now.png"
+    },
+    {
+      "id": "resolution",
+      "title": "Set Resolution and Window Mode",
+      "description": "Configure display for 16:9 aspect ratio",
+      "instructions": [
+        "Go to Settings → Graphics",
+        "Set Resolution to 1920x1080 (or 2560x1440, 3840x2160)",
+        "IMPORTANT: Keep 16:9 aspect ratio",
+        "Set Screen Type to 'Windowed Borderless'",
+        "Apply settings"
+      ],
+      "optional": false,
+      "image_path": "docs/envs/images/rdr2/resolution.png"
+    },
+    {
+      "id": "minimap",
+      "title": "Enlarge Minimap Icons",
+      "description": "Makes minimap easier for AI to read",
+      "instructions": [
+        "Go to Settings → Display",
+        "Set 'Radar Blip Size' to Large",
+        "Set 'Map Blip Size' to Large",
+        "Set 'Radar' to Expanded (or press Alt+X in game)",
+        "Apply settings"
+      ],
+      "optional": false,
+      "image_path": "docs/envs/images/rdr2/minimap_setting.png"
+    },
+    {
+      "id": "subtitles",
+      "title": "Enable Speaker Names in Subtitles",
+      "description": "Shows who is speaking in dialogue",
+      "instructions": [
+        "Go to Settings → Display",
+        "Find subtitle settings",
+        "Enable 'Show Speaker Name'",
+        "Apply settings"
+      ],
+      "optional": false,
+      "image_path": "docs/envs/images/rdr2/subtitles.png"
+    },
+    {
+      "id": "load_save",
+      "title": "Load Game Save or Start Story",
+      "description": "Choose starting point for your task",
+      "instructions": [
+        "For main storyline: Start new game, skip intro videos, pause with ESC at Chapter 1",
+        "For open-ended: Load save file from Chapter 2, pause with ESC"
+      ],
+      "optional": false,
+      "image_path": "docs/envs/images/rdr2/rdr2_main_storyline_start.jpg"
+    }
+  ],
+
+  "validation": {
+    "check_window": true,
+    "window_pattern": "Red Dead Redemption 2",
+    "check_resolution": true,
+    "expected_resolution": [1920, 1080],
+    "check_dependencies": true
+  },
+
+  "quick_start": {
+    "command": "python run.py rdr2-story",
+    "with_ollama": "python run.py rdr2-story --llm ollama",
+    "open_world": "python run.py rdr2-open"
+  }
+}

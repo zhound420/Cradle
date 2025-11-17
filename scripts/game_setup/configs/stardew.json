@@ -1,0 +1,81 @@
+{
+  "display_name": "Stardew Valley",
+  "short_name": "stardew",
+  "type": "game",
+  "platform": "multi",
+  "env_config": "conf/env_config_stardew.json",
+  "description": "Farming simulation and role-playing game",
+
+  "requirements": {
+    "resolution": "1920x1080",
+    "aspect_ratio": "16:9",
+    "window_mode": "Windowed",
+    "platform_notes": {
+      "windows": "Standard installation",
+      "darwin": "macOS supported",
+      "linux": "Linux supported"
+    }
+  },
+
+  "dependencies": [],
+
+  "save_files": {
+    "enabled": true,
+    "source_dir": "res/stardew/saves",
+    "files": [],
+    "notes": "Save files for different scenarios provided"
+  },
+
+  "checklist": [
+    {
+      "id": "resolution",
+      "title": "Set Resolution",
+      "description": "Configure game to run at 1920x1080",
+      "instructions": [
+        "Launch Stardew Valley",
+        "Go to Options",
+        "Set resolution to 1920x1080",
+        "Set to Windowed mode",
+        "Apply settings"
+      ],
+      "optional": false
+    },
+    {
+      "id": "zoom",
+      "title": "Set Zoom Level",
+      "description": "Configure zoom for optimal visibility",
+      "instructions": [
+        "In Options, find Zoom Level",
+        "Set to 100% (default)",
+        "Ensure UI scale is at 100%"
+      ],
+      "optional": false
+    },
+    {
+      "id": "load_save",
+      "title": "Load Appropriate Save File",
+      "description": "Load save for your chosen scenario",
+      "instructions": [
+        "From main menu, click Load",
+        "Select the appropriate save file for your scenario:",
+        "  - Shopping scenario",
+        "  - Farming scenario",
+        "  - Cultivation scenario"
+      ],
+      "optional": false
+    }
+  ],
+
+  "validation": {
+    "check_window": true,
+    "window_pattern": "Stardew Valley",
+    "check_resolution": true,
+    "expected_resolution": [1920, 1080]
+  },
+
+  "quick_start": {
+    "command": "python run.py stardew-shopping",
+    "farming": "python run.py stardew-farming",
+    "cultivation": "python run.py stardew-cultivation"
+  }
+}

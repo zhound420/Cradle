@@ -1,0 +1,70 @@
+{
+  "display_name": "Microsoft Outlook",
+  "short_name": "outlook",
+  "type": "application",
+  "platform": "windows",
+  "env_config": "conf/env_config_outlook.json",
+  "description": "Email and calendar application",
+
+  "requirements": {
+    "resolution": "1920x1080",
+    "aspect_ratio": "16:9",
+    "window_mode": "Windowed",
+    "platform_notes": {
+      "windows": "Microsoft Outlook 2016 or later recommended"
+    }
+  },
+
+  "dependencies": [],
+
+  "save_files": {
+    "enabled": false
+  },
+
+  "checklist": [
+    {
+      "id": "install",
+      "title": "Install Microsoft Outlook",
+      "description": "Ensure Outlook is installed on your system",
+      "instructions": [
+        "Install Microsoft Office suite",
+        "Or install Outlook standalone",
+        "Launch Outlook and complete initial setup",
+        "Sign in with your Microsoft account"
+      ],
+      "optional": false
+    },
+    {
+      "id": "window_size",
+      "title": "Set Window Size",
+      "description": "Configure Outlook window for consistent layout",
+      "instructions": [
+        "Launch Outlook",
+        "Set window to a standard size (preferably maximized)",
+        "Ensure main email view is visible"
+      ],
+      "optional": false
+    },
+    {
+      "id": "test_ready",
+      "title": "Verify Outlook is Ready",
+      "description": "Ensure Outlook is ready for automation",
+      "instructions": [
+        "Outlook should be on the main inbox view",
+        "Close any popup dialogs or notifications",
+        "Leave Outlook window open"
+      ],
+      "optional": false
+    }
+  ],
+
+  "validation": {
+    "check_window": true,
+    "window_pattern": "Outlook$",
+    "check_resolution": false
+  },
+
+  "quick_start": {
+    "command": "python run.py outlook"
+  }
+}

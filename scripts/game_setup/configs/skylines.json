@@ -1,0 +1,106 @@
+{
+  "display_name": "Cities: Skylines",
+  "short_name": "skylines",
+  "type": "game",
+  "platform": "multi",
+  "env_config": "conf/env_config_skylines.json",
+  "description": "City-building simulation game",
+
+  "requirements": {
+    "resolution": "1920x1080",
+    "aspect_ratio": "16:9",
+    "window_mode": "Fullscreen",
+    "platform_notes": {
+      "windows": "Set monitor resolution to 1920x1080",
+      "darwin": "Requires M1+ chip with external monitor at 1920x1080 low resolution",
+      "linux": "Set display to 1920x1080"
+    }
+  },
+
+  "dependencies": [],
+
+  "save_files": {
+    "enabled": true,
+    "source_dir": "res/skylines/saves",
+    "files": ["skylines_initial.crp"]
+  },
+
+  "checklist": [
+    {
+      "id": "resolution",
+      "title": "Set Display Resolution",
+      "description": "Configure game to run at 1920x1080 with 16:9 aspect ratio",
+      "instructions": [
+        "Launch Cities: Skylines",
+        "Go to Settings → Graphics",
+        "Set Aspect Ratio to 16:9",
+        "Set Resolution to 1920x1080",
+        "Set Window Mode to Fullscreen",
+        "Click Apply and confirm"
+      ],
+      "optional": false,
+      "image_path": "docs/envs/images/skylines/resolution.png"
+    },
+    {
+      "id": "edge_scrolling",
+      "title": "Disable Edge Scrolling",
+      "description": "Turn off edge scrolling to prevent unintended camera movement",
+      "instructions": [
+        "Go to Settings → Gameplay",
+        "Find 'Edge Scrolling Enabled'",
+        "Set to OFF"
+      ],
+      "optional": false,
+      "image_path": "docs/envs/images/skylines/gameplay.png"
+    },
+    {
+      "id": "day_night",
+      "title": "Disable Day/Night Cycle",
+      "description": "Turn off day/night cycle for consistent lighting",
+      "instructions": [
+        "Go to Settings → Gameplay",
+        "Find 'Use day/night cycle'",
+        "Set to OFF"
+      ],
+      "optional": false,
+      "image_path": "docs/envs/images/skylines/gameplay.png"
+    },
+    {
+      "id": "color_correction",
+      "title": "Set Color Correction (Optional)",
+      "description": "Improve visual clarity for better AI vision",
+      "instructions": [
+        "Go to Settings → Graphics",
+        "Set Color Correction Override to 'Vibrant'",
+        "Set Shadows Distance to 'Very Short'"
+      ],
+      "optional": true,
+      "image_path": "docs/envs/images/skylines/resolution.png"
+    },
+    {
+      "id": "load_save",
+      "title": "Load Initial Save File",
+      "description": "Load the skylines_initial save to start from the correct position",
+      "instructions": [
+        "From main menu, click 'Load Game'",
+        "Find and select 'skylines_initial'",
+        "Wait for the game to load completely",
+        "You should see the beginning of a new city"
+      ],
+      "optional": false,
+      "image_path": "docs/envs/images/skylines/skylines_start.jpg"
+    }
+  ],
+
+  "validation": {
+    "check_window": true,
+    "window_pattern": "Cities: Skylines",
+    "check_resolution": true,
+    "expected_resolution": [1920, 1080]
+  },
+
+  "quick_start": {
+    "command": "python run.py skylines",
+    "with_ollama": "python run.py skylines --llm ollama"
+  }
+}

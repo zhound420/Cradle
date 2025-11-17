@@ -178,23 +178,36 @@ Next steps:
    • Microsoft Outlook
    • Google Chrome
 
-3️⃣  Run Cradle with simplified command:
+3️⃣  Setup game-specific configuration (NEW!):
+
+   python game-setup.py --list       # See all games
+   python game-setup.py skylines     # Setup Cities: Skylines
+   python game-setup.py rdr2         # Setup RDR2 (auto-installs dependencies)
+
+   The game setup wizard will:
+   • Detect game installation
+   • Install save files automatically
+   • Guide through in-game settings
+   • Validate complete setup
+
+4️⃣  Run Cradle with simplified command:
 
    python run.py skylines               # Use default provider
-   python run.py skylines --llm ollama  # Use specific provider
+   python run.py skylines --llm ollama  # Use FREE local LLM
 
    Or see all options:
 
    python run.py --list
 
-4️⃣  Validate your setup:
+5️⃣  Validate your setup:
 
    python validate.py skylines
 
-5️⃣  Read the documentation:
+6️⃣  Read the documentation:
 
    • README.md - Overview and installation
    • CLAUDE.md - Detailed architecture guide
+   • docs/GAME_SETUP_GUIDE.md - Game setup wizard guide (NEW!)
    • docs/envs/ - Game-specific setup guides
    • docs/PROVIDER_MANAGEMENT.md - LLM provider guide
    • docs/LOCAL_LLM_SETUP.md - Local LLM setup

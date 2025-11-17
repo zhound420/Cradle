@@ -55,7 +55,7 @@ Click on either of the video thumbnails above to watch them on YouTube.
 
 **This fork** provides simplified setup, FREE local LLM support, and automatic vision model detection!
 
-### 1. Clone and Setup
+### 1. Clone and Setup Environment
 ```bash
 # Clone this enhanced fork
 git clone https://github.com/zhound420/Cradle.git
@@ -74,7 +74,37 @@ The setup wizard will guide you through:
 
 **Note**: Setup auto-creates configs for local providers (localhost by default). You can skip API keys and use FREE local LLMs instead!
 
-### 2. Run a Game or Application
+### 2. Setup a Specific Game
+
+**NEW!** Use the automated game setup wizard:
+
+```bash
+# List available games
+python game-setup.py --list
+
+# Setup Cities: Skylines (recommended for beginners)
+python game-setup.py skylines
+
+# Setup Red Dead Redemption 2 (includes dependency installation)
+python game-setup.py rdr2
+
+# Quick setup with minimal prompts
+python game-setup.py stardew --quick
+
+# Check if game is properly configured
+python game-setup.py skylines --check-only
+```
+
+The game setup wizard will:
+- ✓ Detect game installation automatically
+- ✓ Install save files to correct locations
+- ✓ Guide through in-game settings with interactive checklists
+- ✓ Install game-specific dependencies (e.g., GroundingDino for RDR2)
+- ✓ Validate complete setup before running
+
+See [Game Setup Guide](docs/GAME_SETUP_GUIDE.md) for detailed instructions.
+
+### 3. Run a Game or Application
 
 ```bash
 # List available games/apps
@@ -83,7 +113,10 @@ python run.py --list
 # Run Cities: Skylines (recommended for beginners)
 python run.py skylines
 
-# Run with Claude instead of OpenAI
+# Run with FREE local LLM (no API costs!)
+python run.py skylines --llm ollama
+
+# Run with Claude API
 python run.py skylines --llm claude
 
 # Other examples
@@ -92,7 +125,7 @@ python run.py outlook
 python run.py stardew-shopping
 ```
 
-### 3. Validate Your Setup
+### 4. Validate Your Setup
 
 ```bash
 # Validate specific game/app

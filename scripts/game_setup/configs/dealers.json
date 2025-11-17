@@ -1,0 +1,62 @@
+{
+  "display_name": "Dealer's Life 2",
+  "short_name": "dealers",
+  "type": "game",
+  "platform": "windows",
+  "env_config": "conf/env_config_dealers.json",
+  "description": "Pawn shop management simulation game",
+
+  "requirements": {
+    "resolution": "1920x1080",
+    "aspect_ratio": "16:9",
+    "window_mode": "Windowed",
+    "platform_notes": {
+      "windows": "Windows only"
+    }
+  },
+
+  "dependencies": [],
+
+  "save_files": {
+    "enabled": true,
+    "source_dir": "res/dealers/saves",
+    "files": []
+  },
+
+  "checklist": [
+    {
+      "id": "resolution",
+      "title": "Set Resolution",
+      "description": "Configure game display settings",
+      "instructions": [
+        "Launch Dealer's Life 2",
+        "Go to Settings",
+        "Set resolution to 1920x1080",
+        "Set to Windowed mode",
+        "Apply settings"
+      ],
+      "optional": false
+    },
+    {
+      "id": "load_save",
+      "title": "Load or Start Game",
+      "description": "Load save file or start new game",
+      "instructions": [
+        "From main menu, load provided save file",
+        "Or start a new game if preferred"
+      ],
+      "optional": false
+    }
+  ],
+
+  "validation": {
+    "check_window": true,
+    "window_pattern": "Dealer",
+    "check_resolution": true,
+    "expected_resolution": [1920, 1080]
+  },
+
+  "quick_start": {
+    "command": "python run.py dealers"
+  }
+}

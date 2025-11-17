@@ -85,20 +85,27 @@ def validate_specific_game(game_key: str):
         print("-" * 40)
         print(f"   ⚠️  Please ensure {game_key} is installed and runnable")
         print("      This script cannot detect game installations automatically")
+        print(f"\n   💡 TIP: Use the game setup wizard for automated setup:")
+        print(f"      python game-setup.py {game_key}")
 
     elif env_name in ['outlook', 'chrome', 'capcut', 'feishu', 'xiuxiu']:
         print(f"\n📱 Application Check")
         print("-" * 40)
         print(f"   ⚠️  Please ensure {game_key} is installed")
+        print(f"\n   💡 TIP: Use the game setup wizard for guided setup:")
+        print(f"      python game-setup.py {game_key}")
 
     # Overall status
     print("\n" + "=" * 60)
     if general_ok and env_ok:
         print(f"✅ {game_key} is ready to use!")
         print(f"\nRun with: python run.py {game_key}")
+        print(f"Or with FREE local LLM: python run.py {game_key} --llm ollama")
     else:
         print(f"⚠️  {game_key} setup is incomplete")
-        print("   Run 'python setup.py' to fix common issues")
+        print("\n   Recommended: Run the game setup wizard")
+        print(f"   python game-setup.py {game_key}")
+        print("\n   Or run general setup: python setup.py")
 
     print("=" * 60 + "\n")
 
